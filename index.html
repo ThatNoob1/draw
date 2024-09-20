@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cursor Tool Selector</title>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        overflow: hidden;
+        background-color: #205461; /* Gray background */
+        cursor: none; /* Hide the default cursor */
+        position: relative; /* To position the button */
+      }
+
+      .pencil,
+      .eraser {
+        width: 20px; /* Cursor width */
+        height: 20px; /* Cursor height */
+        background-color: #ffa500; /* Orange color for pencil */
+        position: absolute;
+        pointer-events: none; /* Prevent the cursor from capturing mouse events */
+        border-radius: 5px; /* Smooth edges */
+        transition: transform 0.1s;
+      }
+
+      .eraser {
+        background-color: #d3d3d3; /* Light gray for eraser */
+      }
+
+      .refresh-button {
+        position: absolute;
+        top: 10px; /* Position from the top */
+        left: 10px; /* Position from the left */
+        background-color: #ffffff; /* Button background color */
+        border: 1px solid #000; /* Button border */
+        padding: 5px 10px; /* Button padding */
+        font-size: 14px; /* Button font size */
+        cursor: pointer; /* Change cursor on hover */
+      }
+
+      .refresh-button:hover {
+        background-color: #f0f0f0; /* Change background on hover */
+      }
+
+      .tool-selector {
+        position: absolute;
+        top: 10px; /* Position from the top */
+        left: 100px; /* Position from the left */
+        display: flex; /* Flexbox for alignment */
+      }
+
+      .tool-button {
+        width: 30px; /* Button width */
+        height: 30px; /* Button height */
+        margin-right: 5px; /* Space between buttons */
+        border: 1px solid #000; /* Button border */
+        cursor: pointer; /* Change cursor on hover */
+      }
+
+      .tool-button:hover {
+        background-color: #f0f0f0; /* Change background on hover */
+      }
+
+      #canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: auto; /* Allow drawing on the canvas */
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="canvas"></canvas>
+    <div class="pencil" id="pencil"></div>
+    <div class="eraser" id="eraser" style="display: none"></div>
+    <button class="refresh-button" onclick="location.reload();">Refresh</button>
+    <div class="tool-selector">
+      <div
+        class="tool-button"
+        id="select-pencil"
+        onclick="selectTool('pencil')"
+      >
+        ✏️
+      </div>
+      <div
+        class="tool-button"
+        id="select-eraser"
+        onclick="selectTool('eraser')"
+      >
+        🧽
+      </div>
+    </div>
+    <script>
+      const pencil = document.getElementById("pencil");
+      const eraser = document.getElementById("eraser");
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      let currentTool = "pencil";
+      let isDrawing = false;
+
+      // Set canvas dimensions
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Mouse move event to update tool position
+      document.addEventListener("mousemove", (event) => {
+        const x = event.clientX;
+        const y = event.clientY;
+        if (currentTool === "pencil") {
+          pencil.style.transform = `translate(${x - 10}px, ${y - 10}px)`; // Center pencil
+          pencil.style.display = "block";
+          eraser.style.display = "none";
+        } else {
+          eraser.style.transform = `translate(${x - 10}px, ${y - 10}px)`; // Center eraser
+          eraser.style.display = "block";
+          pencil.style.display = "none";
+        }
+      });
+
+      // Start drawing or erasing
+      canvas.addEventListener("mousedown", (event) => {
+        if (currentTool === "pencil") {
+          isDrawing = true;
+          draw(event.clientX, event.clientY);
+        } else if (currentTool === "eraser") {
+          isDrawing = true;
+          erase(event.clientX, event.clientY);
+        }
+      });
+
+      // Stop drawing or erasing
+      canvas.addEventListener("mouseup", () => {
+        isDrawing = false;
+      });
+
+      // Draw on the canvas
+      canvas.addEventListener("mousemove", (event) => {
+        if (isDrawing) {
+          if (currentTool === "pencil") {
+            draw(event.clientX, event.clientY);
+          } else if (currentTool === "eraser") {
+            erase(event.clientX, event.clientY);
+          }
+        }
+      });
+
+      // Drawing function
+      function draw(x, y) {
+        ctx.fillStyle = "white"; // Dot color
+        ctx.fillRect(x - 5, y - 5, 10, 10); // Draw small white square at center
+      }
+
+      // Erasing function
+      function erase(x, y) {
+        ctx.clearRect(x - 15, y - 15, 30, 30); // Larger erasing area
+      }
+
+      function selectTool(tool) {
+        currentTool = tool;
+      }
+    </script>
+  </body>
+</html>
